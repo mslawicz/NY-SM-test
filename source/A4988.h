@@ -7,6 +7,7 @@ class A4988
 {
 public:
     A4988(PinName directionPin, PinName stepPin);
+    void setSpeed(int16_t pulseFrequency);
 private:
     DigitalOut direction;
     PwmOut step;

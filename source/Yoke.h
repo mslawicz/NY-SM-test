@@ -2,6 +2,7 @@
 #define YOKE_H_
 
 #include <mbed.h>
+#include "A4988.h"
 
 class Yoke
 {
@@ -13,6 +14,7 @@ private:
     DigitalOut systemLed;               // yoke heartbeat LED
     uint32_t counter{0};                // counter of handler execution
     Timer handlerTimer;                 // measures time between handler calls
+    A4988 motor;                        // stepper motor under test
 };
 
 #endif /* YOKE_H_ */

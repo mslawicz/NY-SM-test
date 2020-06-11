@@ -3,11 +3,14 @@
 
 Yoke::Yoke(events::EventQueue& eventQueue) :
     eventQueue(eventQueue),
-    systemLed(LED1)
+    systemLed(LED1),
+    motor(PA_14, PA_15)
 {
     printf("Yoke object created\r\n");
 
     handlerTimer.start();
+
+    motor.setSpeed(100.0f);
 
     //Yoke handler is executed every 10 ms
     eventQueue.call_every(10ms, callback(this, &Yoke::handler));
