@@ -15,6 +15,7 @@ private:
     uint32_t counter{0};                // counter of handler execution
     Timer handlerTimer;                 // measures time between handler calls
     A4988 motor;                        // stepper motor under test
+    AnalogIn yellowPot;                 // potentiometer with yellow knob
 };
 
 #endif /* YOKE_H_ */

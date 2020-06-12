@@ -1,16 +1,16 @@
 #include "Yoke.h"
+#include "Scale.h"
 
 
 Yoke::Yoke(events::EventQueue& eventQueue) :
     eventQueue(eventQueue),
     systemLed(LED1),
-    motor(PA_14, PA_15)
+    motor(PA_14, PA_15),
+    yellowPot(PB_0)
 {
     printf("Yoke object created\r\n");
 
     handlerTimer.start();
-
-    motor.setSpeed(100.0f);
 
     //Yoke handler is executed every 10 ms
     eventQueue.call_every(10ms, callback(this, &Yoke::handler));
@@ -23,10 +23,20 @@ Yoke::Yoke(events::EventQueue& eventQueue) :
 */
 void Yoke::handler(void)
 {
+    const int16_t MaxSpeed = 14500;
     counter++;
     float dt = 1e-6 * handlerTimer.elapsed_time().count();
     handlerTimer.reset();
 
     // LED heartbeat
     systemLed = ((counter & 0x68) == 0x68);
+
+    float yellowPotValue = yellowPot.read();
+    int16_t motorSpeed = -scale<float, int16_t>(0.0f, 1.0f, yellowPotValue, -MaxSpeed, MaxSpeed);
+    motor.setSpeed(motorSpeed);
+
+    if(counter % 100 == 0)
+    {
+        printf("%d\r\n", motorSpeed);
+    }
 }
