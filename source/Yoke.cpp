@@ -1,6 +1,12 @@
 #include "Yoke.h"
 #include "Scale.h"
 
+//XXX global variables
+float g_ref;
+float g_pos;
+float g_proportional;
+int16_t g_motorSpeed;
+
 
 Yoke::Yoke(events::EventQueue& eventQueue) :
     eventQueue(eventQueue),
@@ -34,15 +40,19 @@ void Yoke::handler(void)
     systemLed = ((counter & 0x68) == 0x68);
 
     const float PositionBorder = 0.15f;
-    float referencePosition = scale<float, float>(PositionBorder, (1.0f - PositionBorder), yellowPot.read(), 0.0f, 1.0f);
+    float referencePosition = scale<float, float>(0.0f, 1.0f, yellowPot.read(), PositionBorder, (1.0f - PositionBorder));
+    g_ref = referencePosition;
     float motorPosition = positionPot.read();
+    g_pos = motorPosition;
     float positionError = referencePosition - motorPosition;
     float coefficientP = potentiometerP.read();
-    float proportional =  1.0f * coefficientP * positionError;
+    float proportional =  5.0f * coefficientP * positionError;
+    g_proportional = proportional;
 
     float PID = proportional;
     
     int16_t motorSpeed = -scale<float, int16_t>(-1.0f, 1.0f, PID, -MaxSpeed, MaxSpeed);
+    g_motorSpeed = motorSpeed;
 
     if((motorPosition < PositionBorder) ||
         (motorPosition > (1.0f - PositionBorder)))
@@ -56,6 +66,6 @@ void Yoke::handler(void)
 
     if(counter % 100 == 0)
     {
-        printf("ref=%f  pos=%f  err=%f  cP=%f  P=%f ms=%d\r\n", referencePosition, motorPosition, positionError, coefficientP, proportional, motorSpeed);
+        printf("ref=%f  pos=%f  err=%f  cP=%f  P=%f  ms=%d\r\n", referencePosition, motorPosition, positionError, coefficientP, proportional, motorSpeed);
     }
 }
