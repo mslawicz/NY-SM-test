@@ -7,7 +7,8 @@ Yoke::Yoke(events::EventQueue& eventQueue) :
     systemLed(LED1),
     motor(PA_14, PA_15),
     positionPot(PA_0),
-    yellowPot(PB_0)
+    yellowPot(PB_0),
+    potentiometerP(PA_1)
 {
     printf("Yoke object created\r\n");
 
@@ -36,8 +37,12 @@ void Yoke::handler(void)
     float referencePosition = scale<float, float>(PositionBorder, (1.0f - PositionBorder), yellowPot.read(), 0.0f, 1.0f);
     float motorPosition = positionPot.read();
     float positionError = referencePosition - motorPosition;
+    float coefficientP = potentiometerP.read();
+    float proportional =  1.0f * coefficientP * positionError;
+
+    float PID = proportional;
     
-    int16_t motorSpeed = -scale<float, int16_t>(0.0f, 1.0f, referencePosition, -MaxSpeed, MaxSpeed);
+    int16_t motorSpeed = -scale<float, int16_t>(-1.0f, 1.0f, PID, -MaxSpeed, MaxSpeed);
 
     if((motorPosition < PositionBorder) ||
         (motorPosition > (1.0f - PositionBorder)))
@@ -51,6 +56,6 @@ void Yoke::handler(void)
 
     if(counter % 100 == 0)
     {
-        printf("ref=%f  pos=%f  err=%f\r\n", referencePosition, motorPosition, positionError);
+        printf("ref=%f  pos=%f  err=%f  cP=%f  P=%f ms=%d\r\n", referencePosition, motorPosition, positionError, coefficientP, proportional, motorSpeed);
     }
 }

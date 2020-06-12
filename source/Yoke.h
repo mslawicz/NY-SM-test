@@ -17,6 +17,7 @@ private:
     A4988 motor;                        // stepper motor under test
     AnalogIn positionPot;               // motor position potentiometer
     AnalogIn yellowPot;                 // potentiometer with yellow knob
+    AnalogIn potentiometerP;            // PID P potentiometer
 };
 
 #endif /* YOKE_H_ */
