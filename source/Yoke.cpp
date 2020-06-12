@@ -32,13 +32,25 @@ void Yoke::handler(void)
     // LED heartbeat
     systemLed = ((counter & 0x68) == 0x68);
 
-    float yellowPotValue = yellowPot.read();
-    float position = positionPot.read();
-    int16_t motorSpeed = -scale<float, int16_t>(0.0f, 1.0f, yellowPotValue, -MaxSpeed, MaxSpeed);
-    //motor.setSpeed(motorSpeed);
+    const float PositionBorder = 0.15f;
+    float referencePosition = scale<float, float>(PositionBorder, (1.0f - PositionBorder), yellowPot.read(), 0.0f, 1.0f);
+    float motorPosition = positionPot.read();
+    float positionError = referencePosition - motorPosition;
+    
+    int16_t motorSpeed = -scale<float, int16_t>(0.0f, 1.0f, referencePosition, -MaxSpeed, MaxSpeed);
+
+    if((motorPosition < PositionBorder) ||
+        (motorPosition > (1.0f - PositionBorder)))
+    {
+        motor.setSpeed(0.0f);
+    }
+    else
+    {
+        motor.setSpeed(motorSpeed);
+    }
 
     if(counter % 100 == 0)
     {
-        printf("pos=%f  %d\r\n", position, motorSpeed);
+        printf("ref=%f  pos=%f  err=%f\r\n", referencePosition, motorPosition, positionError);
     }
 }
