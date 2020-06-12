@@ -32,8 +32,8 @@ void Yoke::handler(void)
     systemLed = ((counter & 0x68) == 0x68);
 
     float yellowPotValue = yellowPot.read();
-    int16_t motorSpeed = -scale<float, int16_t>(0.0f, 1.0f, yellowPotValue, -MaxSpeed, MaxSpeed);
-    motor.setSpeed(motorSpeed);
+    int16_t motorSpeed = scale<float, int16_t>(0.0f, 1.0f, yellowPotValue, 0, MaxSpeed);
+    motor.setSpeed((counter / 100) & 1 ? motorSpeed : -motorSpeed);
 
     if(counter % 100 == 0)
     {
